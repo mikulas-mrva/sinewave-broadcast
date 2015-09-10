@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html>
+   <head>
+       <script src="socket.js" type="text/javascript"></script>
+<style>
+  .draggable {width:50px;height:50px;position:absolute}
+  #d1 {background-color:#f00;}
+  #d2 {background-color:#0f0;left: 100px;}
+  #d3 {background-color:#00f;left: 200px;}
+</style>
+   </head>
+   <body>
+      <h1>Sinewave-broadcast</h1>
+      <h2><a href="#" onclick="play_all(); return false;">play</a></h2>
+      <h2><a href="#" onclick="stop_all(); return false;">stop</a></h2>
+
+      <noscript>You must enable JavaScript</noscript>
+<div id="dragspace">
+    <div class="draggable" id="d1" ></div>
+    <div class="draggable" id="d2" ></div>
+    <div class="draggable" id="d3" ></div>
+</div>
+
+<script>
+var nodeList = document.getElementsByClassName('draggable');
+
+var touch_callback = function(e) {
+    var touch = e.targetTouches[0];
+    // Place element where the finger is
+    send_move(e.target.id, touch.pageX, touch.pageY);
+    event.preventDefault();
+};
+
+var drag_callback = function(e) {
+    // Place element where the finger is
+    if (e.pageX + e.pageY != 0)
+        send_move(e.target.id, e.pageX, e.pageY);
+    e.preventDefault();
+};
+
+
+
+for(var i=0;i<nodeList.length;i++) {
+    var obj = nodeList[i];
+    obj.addEventListener('touchmove', touch_callback, false);
+    obj.addEventListener('drag', drag_callback, false);
+}
+
+var context = new AudioContext(); // Create audio container
+
+var sineList = {};
+
+for (var j=0;j<nodeList.length;j++) {
+    var id = nodeList[j].id;
+    sineList[id] = {"sine": context.createOscillator(), "gain": context.createGain()};
+    sineList[id]["sine"].connect(sineList[id]["gain"]);
+    sineList[id]["gain"].connect(context.destination);
+//    sineList[id]["sine"].start(0);
+}
+
+</script>
+       <script src="sine.js" type="text/javascript"></script>
+  </body>
+</html>
